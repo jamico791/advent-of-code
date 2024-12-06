@@ -37,7 +37,7 @@ class Grid:
         elif lines:
             self.data = [[str(unit) for unit in line] for line in lines]
             self.height = len(self.data)
-            self.width = max(self.data, key=len)
+            self.width = len(self.data[0])
         else:
             raise ValueError("You have to specify either rows and cols, or lines")
         self.default = default
@@ -52,7 +52,7 @@ class Grid:
             for char in row:
                 pointer = None
                 for p in self.pointers.values():
-                    if p.x == i and p.y == j:
+                    if p.x == j and p.y == i:
                         pointer = p
                 if j > 1:
                     res += " "
@@ -150,7 +150,6 @@ class Grid:
             raise ValueError("The pointer must lie within the boundaries of the grid.")
 
 if __name__ == "__main__":
-    grid = Grid(1, 2, default=0)
-    grid.add_pointer("santa", Color.red.value)
-
-    print(grid.get_pointer("santa"))
+    for i in range(10):
+        for j in range(10):
+            print(i, j)
