@@ -3,12 +3,14 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utility
+from utils.files import read_lines
+from utils.grids import Grid
+from utils.globals import Color
 
-input_file = "data.txt"
+input_file = "example.txt"
 
 def main():
-    lines = utility.read_lines(input_file)
+    lines = read_lines(input_file)
     lines = [line.rstrip("\n") for line in lines]
     total = 0
     combinations = len(lines) * len(lines[0])
@@ -20,9 +22,9 @@ def main():
             counter += 1
             loop_detected = False
             print(f"{counter}/{combinations}")
-            grid = utility.Grid(lines=lines, infinite=True)
+            grid = Grid(lines=lines, infinite=True)
             pointer_name = "guard"
-            grid.add_pointer(pointer_name, utility.Color.red.value)
+            grid.add_pointer(pointer_name, Color.red.value)
             pointer = grid.get_pointer(pointer_name)
             for k in range(grid.height):
                 for l in range(grid.width):

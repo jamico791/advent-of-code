@@ -3,7 +3,7 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utility
+from utils.files import read_lines
 
 input_file = "data.txt"
 
@@ -12,8 +12,7 @@ def parse_lists(input_file):
     list1 = []
     list2 = []
     
-    with open(input_file) as file:
-        lines = file.readlines()
+    lines = read_lines(input_file)
 
     for line in lines:
         tuple = line.rstrip("\n").split()

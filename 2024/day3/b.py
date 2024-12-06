@@ -4,7 +4,7 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utility
+from utils.files import read_lines
 
 input_file = "data.txt"
 regex = r"mul\([\d]{1,3},[\d]{1,3}\)"
@@ -16,7 +16,7 @@ def do_multiply(string):
     
 
 def main():
-    lines = utility.read_lines(input_file)
+    lines = read_lines(input_file)
     matches = []
     total = 0
     do = True

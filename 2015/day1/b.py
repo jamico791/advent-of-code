@@ -3,12 +3,12 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utility
+from utils.files import read_first_line
 
 input_file = "data.txt"
 
 def main():
-    directions = utility.read_first_line(input_file)
+    directions = read_first_line(input_file)
     final_floor = 0
     for i in range(len(directions)):
         if directions[i] == "(":

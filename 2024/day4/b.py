@@ -3,7 +3,7 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utility
+from utils.files import read_lines
 
 input_file = "data.txt"
 
@@ -13,7 +13,7 @@ def find(board, row, col):
     return board[row][col]
 
 def main():
-    board = utility.read_lines(input_file)
+    board = read_lines(input_file)
     total = 0
     for i in range(len(board)):
         board[i] = board[i].rstrip("\n")

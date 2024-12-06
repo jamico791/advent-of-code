@@ -3,8 +3,7 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-
-import utility
+import utils.utility as utility
 
 input_file = "example.txt"
 

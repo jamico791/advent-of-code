@@ -3,17 +3,18 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-
-import utility
+from utils.files import read_lines
+from utils.grids import Grid
+from utils.globals import Color
 
 input_file = "data.txt"
 
 def main():
-    lines = utility.read_lines(input_file)
-    grid = utility.Grid(lines=lines, infinite=True)
+    lines = read_lines(input_file)
+    grid = Grid(lines=lines, infinite=True)
     total = 0
     pointer_name = "guard"
-    grid.add_pointer(pointer_name, utility.Color.red.value)
+    grid.add_pointer(pointer_name, Color.red.value)
     for i in range(grid.height-1):
         for j in range(grid.width-1):
             char = grid.data[i][j]

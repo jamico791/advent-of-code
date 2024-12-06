@@ -1,24 +1,4 @@
-"""Various utilities for Advent of Code"""
-
-from enum import Enum
-
-def read_first_line(input_file):
-    with open(input_file, "r") as file:
-        line = file.readline()
-        
-    return line
-
-def read_lines(input_file):
-    with open(input_file, "r") as file:
-        lines = file.readlines()
-
-    return lines
-
-class Color(Enum):
-    default = "\033[0m"
-    red = "\033[91m"
-    green = "\033[92m"
-    blue = "\033[94m"
+from utils.globals import Color
 
 class Pointer:
     def __init__(self, x: int, y: int, name: str, color: str):
@@ -148,8 +128,3 @@ class Grid:
                 self.height = len(self.data)
         elif x < 1 or y < 1 or x > self.width or y > self.height:
             raise ValueError("The pointer must lie within the boundaries of the grid.")
-
-if __name__ == "__main__":
-    for i in range(10):
-        for j in range(10):
-            print(i, j)
