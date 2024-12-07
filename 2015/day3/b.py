@@ -4,41 +4,34 @@ os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
 from utils.files import read_first_line
-from utils.grids import Grid
-from utils.globals import Color
+from utils.grids import Grid, Point
+from utils.globals import Color, Direction
 
-input_file = "data.txt"
+input_file = "example.txt"
 
 def main():
     directions = read_first_line(input_file)
     total = 0
 
     grid = Grid(rows=1, cols=1, default=0, infinite=True)
-    grid.add_pointer("santa", Color.red.value)
-    grid.set_pointer_value("santa", grid.get_pointer_value("santa") + 1)
-
-    grid.add_pointer("robo-santa", Color.green.value)
-    grid.set_pointer_value("robo-santa", grid.get_pointer_value("robo-santa") + 1)
+    santa = Point(0, 0, Color.RED)
+    robo_santa = Point(0, 0, Color.GREEN)
+    grid.add_point(santa)
+    grid.add_point(robo_santa)
+    grid.increment(santa)
+    grid.increment(robo_santa)
 
     print(grid)
     print()
     for idx, char in enumerate(directions):
-        pointer_name = "santa"
+        point = santa
         if idx % 2 != 0:
-            pointer_name = "robo-santa"
+            point = robo_santa
 
-        if char == "^":
-            grid.north(pointer_name)
-        elif char == "v":
-            grid.south(pointer_name)
-        elif char == ">":
-            grid.east(pointer_name)
-        elif char == "<":
-            grid.west(pointer_name)
-        grid.set_pointer_value(pointer_name, grid.get_pointer_value(pointer_name) + 1)
-        if idx < 40:
-            print(grid)
-            print()
+        point.shift_direction_char(char)
+        grid.increment(point)
+        print(grid)
+        print()
 
     for block in grid.data:
         for house in block:

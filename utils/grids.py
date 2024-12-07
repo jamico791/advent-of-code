@@ -1,11 +1,35 @@
-from utils.globals import Color
+if __name__ == "__main__":
+    from globals import Color, Direction
 
-class Pointer:
-    def __init__(self, x: int, y: int, name: str, color: str):
+else:
+    from utils.globals import Color, Direction
+
+class Point:
+    def __init__(self, x: int, y: int, color: str = Color.GREEN):
         self.x = x
         self.y = y
-        self.name = name
         self.color = color
+    
+    def __repr__(self):
+        return f"{self.color}x={self.x}, y={self.y}{Color.DEFAULT}"
+    
+    def move(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    def shift(self, vector: list[int]):
+        self.x += vector[0]
+        self.y -= vector[1]
+    
+    def shift_direction_char(self, char: str):
+        if char == "^":
+            self.shift(Direction.NORTH)
+        elif char == "v":
+            self.shift(Direction.SOUTH)
+        elif char == ">":
+            self.shift(Direction.EAST)
+        elif char == "<":
+            self.shift(Direction.WEST)
 
 class Grid:
     """A work in progress class to solve grid related problems"""
@@ -22,109 +46,100 @@ class Grid:
             raise ValueError("You have to specify either rows and cols, or lines")
         self.default = default
         self.infinite = infinite
-        self.pointers: dict[str:Pointer] = {}
+        self.points: set[Point] = set()
 
     def __repr__(self):
+        self.update_size()
         res = ""
-        i = 1
+        i = 0
         for row in self.data:
-            j = 1
+            j = 0
             for char in row:
-                pointer = None
-                for p in self.pointers.values():
+                point = None
+                for p in self.points:
                     if p.x == j and p.y == i:
-                        pointer = p
-                if j > 1:
+                        point = p
+                if j > 0:
                     res += " "
-                if pointer:
-                    res += pointer.color
+                if point:
+                    res += point.color
                 res += str(char)
-                if pointer:
-                    res += Color.default.value
-                if i < len(self.data) and j ==len(row):
+                if point:
+                    res += Color.DEFAULT
+                if i < len(self.data) - 1 and j == len(row) - 1:
                     res += "\n"
                 j += 1
             i += 1
         return res
 
-    def add_pointer(self, name: str, color: str):
-        pointer = Pointer(1, 1, name, color)
-        self.pointers[name] = pointer
+    def add_point(self, point: Point):
+        self.points.add(point)
 
-    def north(self, name):
-        """Moves the pointer up"""
-        pointer = self.get_pointer(name)
-        self.move_pointer(name, pointer.x, pointer.y - 1)
+    def get_value(self, point: Point):
+        self.update_size()
+        return self.data[point.y][point.x]
 
-    def east(self, name: str):
-        """Moves the pointer right"""
-        pointer = self.get_pointer(name)
-        self.move_pointer(name, pointer.x + 1, pointer.y)
+    def set_value(self, point: Point, new_value: any):
+        self.update_size()
+        self.data[point.y][point.x] = new_value
 
-    def south(self, name: str):
-        """Moves the pointer down"""
-        pointer = self.get_pointer(name)
-        self.move_pointer(name, pointer.x, pointer.y + 1)
+    def get_relative_value(self, point: Point, vector: list[int]):
+        self.update_size()
+        relative_x = point.x + vector[0]
+        relative_y = point.y - vector[1]
+        if relative_x < 0 or relative_x >= self.width or relative_y < 0 or relative_y >= self.height:
+            return None
+        return self.data[relative_y][relative_x]
 
-    def west(self, name: str):
-        """Moves the pointer left"""
-        pointer = self.get_pointer(name)
-        self.move_pointer(name, pointer.x - 1, pointer.y)
-    
-    def northeast(self, name: str):
-        self.north(name)
-        self.east(name)
+    def increment(self, point: Point):
+        self.update_size()
+        self.data[point.y][point.x] += 1
 
-    def northwest(self, name: str):
-        self.north(name)
-        self.west(name)
+    def decrement(self, point: Point):
+        self.update_size()
+        self.data[point.y][point.x] -= 1
 
-    def southwest(self, name: str):
-        self.south(name)
-        self.west(name)
+    def update_size(self):
+        for point in self.points:
+            if self.infinite:
+                if point.x < 0:
+                    for other_point in self.points:
+                        if point != other_point:
+                            other_point.shift([-1, 0])
+                    for row in self.data:
+                        for _ in range(0 - point.x):
+                            row.insert(0, self.default)
+                    point.x = 0
+                    self.width = len(self.data[0])
+                elif point.x > self.width - 1:
+                    for row in self.data:
+                        for _ in range(point.x - (self.width - 1)):
+                            row.append(self.default)
+                    self.width = len(self.data[0])
+                if point.y < 0:
+                    for other_point in self.points:
+                        if point != other_point:
+                            other_point.shift([0, 1])
+                    for _ in range(0 - point.y):
+                        self.data.insert(0, [self.default for n in range(self.width)])
+                    point.y = 0
+                    self.height = len(self.data)
+                if point.y > self.height - 1:
+                    for _ in range(point.y - (self.height - 1)):
+                        self.data.append([self.default for n in range(self.width)])
+                    self.height = len(self.data)
+            else:
+                if point.x < 0 or point.y < 0 or point.x > self.width - 1 or point.y > self.height - 1:
+                    raise ValueError("The pointer must lie within the boundaries of the grid.")
 
-    def southeast(self, name: str):
-        self.south(name)
-        self.east(name)
-
-    def get_pointer_value(self, pointer_name: str):
-        pointer = self.get_pointer(pointer_name)
-        return self.data[pointer.y - 1][pointer.x - 1]
-
-    def set_pointer_value(self, pointer_name: str, new_value: any):
-        pointer = self.get_pointer(pointer_name)
-        self.data[pointer.y - 1][pointer.x - 1] = new_value
-    
-    def get_pointer(self, name: str):
-        return self.pointers[name]
-
-    def move_pointer(self, name: str, x: int, y: int):
-        if not isinstance(x, int) or not isinstance(y, int):
-            raise TypeError("x and y must be integers")
-        pointer = self.get_pointer(name)
-        pointer.x = x
-        pointer.y = y
-
-        if self.infinite:
-            if x < 1:
-                for row in self.data:
-                    for _ in range(1 - x):
-                        row.insert(0, self.default)
-                    pointer.x = 1
-                self.width = len(max(self.data, key=len))
-            elif x > self.width:
-                for row in self.data:
-                    for _ in range(x - self.width):
-                        row.append(self.default)
-                self.width = len(max(self.data, key=len))
-            if y < 1:
-                for _ in range(1 - y):
-                    self.data.insert(0, [self.default for n in range(self.width)])
-                pointer.y = 1
-                self.height = len(self.data)
-            if y > self.height:
-                for _ in range(y - self.height):
-                    self.data.append([self.default for n in range(self.width)])
-                self.height = len(self.data)
-        elif x < 1 or y < 1 or x > self.width or y > self.height:
-            raise ValueError("The pointer must lie within the boundaries of the grid.")
+if __name__ == "__main__":
+    point = Point(0, 0, color=Color.BLUE)
+    grid = Grid(rows=2, cols=2, default=0, infinite=True)
+    grid.add_point(point)
+    grid.set_value(point, 3)
+    print(grid)
+    print()
+    # print(grid)
+    point.shift([0, 1])
+    print(grid)
+    print(grid.get_relative_value(point, [0, 1]))

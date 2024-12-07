@@ -4,84 +4,59 @@ os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
 from utils.files import read_lines
-from utils.grids import Grid
-from utils.globals import Color
+from utils.grids import Grid, Point
+from utils.globals import Direction
 
-input_file = "example.txt"
+input_file = "data.txt"
+
+def traverse(grid, initial_guard_position):
+    obstacle_positions = set()
+    visited_set = set()
+    has_loop = False
+
+    guard = Point(initial_guard_position[0], initial_guard_position[1])
+    grid.add_point(guard)
+                
+    og_width = grid.width
+    og_height = grid.height
+
+    while True:
+        char = grid.get_value(guard)
+        vector = Direction.char_to_vector(char)
+        obstacle_positions.add((guard.x, guard.y))
+        visited_value = (guard.x, guard.y, char)
+        has_loop = visited_value in visited_set
+        visited_set.add(visited_value)
+        if grid.get_relative_value(guard, vector) == "#":
+            grid.set_value(guard, Direction.vector_to_char(Direction.next_clockwise_cardinal(vector)))
+        else:
+            guard.shift(vector)
+            grid.set_value(guard, char)
+        if grid.width > og_width or grid.height > og_height or has_loop:
+            break
+
+    return obstacle_positions, has_loop
 
 def main():
-    lines = read_lines(input_file)
-    lines = [line.rstrip("\n") for line in lines]
+    lines = [list(line.rstrip("\n")) for line in read_lines(input_file)]
+    intital_grid = Grid(lines=lines, infinite=True)
+    initial_guard_position = None
     total = 0
-    combinations = len(lines) * len(lines[0])
-    counter = 0
+    for i in range(intital_grid.height-1):
+        for j in range(intital_grid.width-1):
+            char = intital_grid.data[i][j]
+            if char == "^" or char == ">" or char == "v" or char == "<":
+                initial_guard_position = (j, i)
+    
+    obstacle_positions, has_loop = traverse(intital_grid, initial_guard_position)
+    obstacle_positions.discard(initial_guard_position)
+    for position in obstacle_positions:
+        grid = Grid(lines=lines, infinite=True)
+        grid.data[position[1]][position[0]] = "#"
 
-    for i in range(len(lines)):
-        for j in range(len(lines[0])):
-            direction_mapping = [[{""} for char in line] for line in lines]
-            counter += 1
-            loop_detected = False
-            print(f"{counter}/{combinations}")
-            grid = Grid(lines=lines, infinite=True)
-            pointer_name = "guard"
-            grid.add_pointer(pointer_name, Color.red.value)
-            pointer = grid.get_pointer(pointer_name)
-            for k in range(grid.height):
-                for l in range(grid.width):
-                    char = grid.data[k][l]
-                    if char == "^" or char == ">" or char == "v" or char == "<":
-                        grid.move_pointer(pointer_name, l+1, k+1)
-                        direction_mapping[k][l].add(char)
-
-            og_width = grid.width
-            og_height = grid.height
-
-            if i != pointer.y-1 or j != pointer.x-1:
-                grid.data[i][j] = "O"
-            while True:
-                if grid.get_pointer_value(pointer_name) == "^":
-                    grid.set_pointer_value(pointer_name, "X")
-                    grid.north(pointer_name)
-                    if grid.get_pointer_value(pointer_name) == "#" or grid.get_pointer_value(pointer_name) == "O":
-                        grid.south(pointer_name)
-                        grid.set_pointer_value(pointer_name, ">")
-                    else:
-                        grid.set_pointer_value(pointer_name, "^")
-                elif grid.get_pointer_value(pointer_name) == ">":
-                    grid.set_pointer_value(pointer_name, "X")
-                    grid.east(pointer_name)
-                    if grid.get_pointer_value(pointer_name) == "#" or grid.get_pointer_value(pointer_name) == "O":
-                        grid.west(pointer_name)
-                        grid.set_pointer_value(pointer_name, "v")
-                    else:
-                        grid.set_pointer_value(pointer_name, ">")
-                elif grid.get_pointer_value(pointer_name) == "v":
-                    grid.set_pointer_value(pointer_name, "X")
-                    grid.south(pointer_name)
-                    if grid.get_pointer_value(pointer_name) == "#" or grid.get_pointer_value(pointer_name) == "O":
-                        grid.north(pointer_name)
-                        grid.set_pointer_value(pointer_name, "<")
-                    else:
-                        grid.set_pointer_value(pointer_name, "v")
-                elif grid.get_pointer_value(pointer_name) == "<":
-                    grid.set_pointer_value(pointer_name, "X")
-                    grid.west(pointer_name)
-                    if grid.get_pointer_value(pointer_name) == "#" or grid.get_pointer_value(pointer_name) == "O":
-                        grid.east(pointer_name)
-                        grid.set_pointer_value(pointer_name, "^")
-                    else:
-                        grid.set_pointer_value(pointer_name, "<")
-
-                if grid.width > og_width or grid.height > og_height:
-                    break
-                if grid.get_pointer_value(pointer_name) in direction_mapping[pointer.y-1][pointer.x-1]:
-                    loop_detected = True
-                direction_mapping[pointer.y-1][pointer.x-1].add(grid.get_pointer_value(pointer_name))
-                
-
-                if loop_detected:
-                    total += 1
-                    break
+        _, has_loop = traverse(grid, initial_guard_position)
+        if has_loop:
+            total += 1
 
     return total
 
