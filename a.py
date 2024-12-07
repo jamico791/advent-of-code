@@ -3,12 +3,12 @@ current_file_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_file_path)
 sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
-import utils.utility as utility
+from utils.files import read_lines
 
 input_file = "example.txt"
 
 def main():
-    lines = utility.read_lines(input_file)
+    lines = read_lines(input_file)
     for line in lines:
         pass
 
