@@ -17,7 +17,7 @@ class Point:
         self.x = x
         self.y = y
 
-    def shift(self, vector: list[int]):
+    def shift(self, vector: tuple[int]):
         self.x += vector[0]
         self.y -= vector[1]
     
@@ -83,7 +83,7 @@ class Grid:
         self.update_size()
         self.data[point.y][point.x] = new_value
 
-    def get_relative_value(self, point: Point, vector: list[int]):
+    def get_relative_value(self, point: Point, vector: tuple[int]):
         self.update_size()
         relative_x = point.x + vector[0]
         relative_y = point.y - vector[1]

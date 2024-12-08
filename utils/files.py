@@ -8,7 +8,12 @@ def read_first_line(input_file):
 
 def read_lines(input_file):
     with open(input_file, "r") as file:
-        lines = file.readlines()
+        lines = [line.rstrip("\n") for line in file.readlines()]
+
+    return lines
+
+def read_lines_as_chars(input_file):
+    lines = [list(line) for line in read_lines(input_file)]
 
     return lines
 
