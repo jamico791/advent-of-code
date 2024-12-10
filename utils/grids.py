@@ -39,7 +39,7 @@ class Grid:
             self.height = rows
             self.width = cols
         elif lines:
-            self.data = [[str(unit) for unit in line] for line in lines]
+            self.data = [[unit for unit in line] for line in lines]
             self.height = len(self.data)
             self.width = len(self.data[0])
         else:
@@ -70,6 +70,23 @@ class Grid:
                     res += "\n"
                 j += 1
             i += 1
+        return res
+
+    def find_all(self, target: any):
+        res = []
+        for idy, line in enumerate(self.data):
+            for idx, item in enumerate(line):
+                if item == target:
+                    res.append((idx, idy))
+        return res
+
+    def get_relative_cardinal_values(self, point: Point):
+        res = {}
+        res[Direction.NORTH] = self.get_relative_value(point, Direction.NORTH) if point.y > 0 else None
+        res[Direction.EAST] = self.get_relative_value(point, Direction.EAST) if point.x < self.width - 1 else None
+        res[Direction.SOUTH] = self.get_relative_value(point, Direction.SOUTH) if point.y < self.height - 1 else None
+        res[Direction.WEST] = self.get_relative_value(point, Direction.WEST) if point.x > 0 else None
+
         return res
 
     def add_point(self, point: Point):

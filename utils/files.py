@@ -17,6 +17,10 @@ def read_lines_as_chars(input_file):
 
     return lines
 
+def read_lines_as_ints(input_file):
+    lines = [[int(char) for char in list(line)] for line in read_lines(input_file)]
+
+    return lines
 
 if __name__ == "__main__":
     for i in range(10):

@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join('..', '..')))
 
 from utils.files import read_first_line
 
-input_file = "datacopy.txt"
+input_file = "example.txt"
 
 def decode(string: str):
     block_representation = []
