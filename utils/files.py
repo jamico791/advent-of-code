@@ -22,6 +22,11 @@ def read_lines_as_ints(input_file):
 
     return lines
 
+def read_specific_line(input_file, line_num: int):
+    lines = read_lines(input_file)
+    
+    return lines[line_num - 1]
+
 if __name__ == "__main__":
     for i in range(10):
         for j in range(10):
