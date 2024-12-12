@@ -13,6 +13,9 @@ class Point:
     def __repr__(self):
         return f"{self.color}x={self.x}, y={self.y}{Color.DEFAULT}"
     
+    def get_location(self):
+        return (self.x, self.y)
+    
     def move(self, x: int, y: int):
         self.x = x
         self.y = y
@@ -31,6 +34,17 @@ class Point:
         elif char == "<":
             self.shift(Direction.WEST)
 
+class Region:
+    def __init__(self, char: str, coord: tuple[int]):
+        self.char = char
+        self.coords = [coord]
+
+    def __repr__(self):
+        return f"Region(char={self.char}, coords={self.coords})"
+
+    def add_coord(self, plant: tuple[int]):
+        self.coords.append(plant)
+
 class Grid:
     """A work in progress class to solve grid related problems"""
     def __init__(self, rows: int = 0, cols: int = 0, default: any = None, lines: list[str|list] = None, infinite: bool = False):
@@ -47,6 +61,7 @@ class Grid:
         self.default = default
         self.infinite = infinite
         self.points: set[Point] = set()
+        self.regions = {}
 
     def __repr__(self):
         self.update_size()
@@ -88,9 +103,24 @@ class Grid:
         res[Direction.WEST] = self.get_relative_value(point, Direction.WEST) if point.x > 0 else None
 
         return res
+    
+    def get_relative_cardinal_positions(self, point: Point):
+        res = {}
+        res[Direction.NORTH] = (point.x, point.y - 1) if point.y > 0 else None
+        res[Direction.EAST] = (point.x + 1, point.y) if point.x < self.width - 1 else None
+        res[Direction.SOUTH] = (point.x, point.y + 1) if point.y < self.height - 1 else None
+        res[Direction.WEST] = (point.x - 1, point.y) if point.x > 0 else None
+
+        return res
 
     def add_point(self, point: Point):
         self.points.add(point)
+
+    def remove_point(self, target: Point):
+        for i in range(len(self.points)):
+            if self.points[i] == target:
+                self.points.pop(i)
+
 
     def get_value(self, point: Point):
         self.update_size()
