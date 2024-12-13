@@ -6,6 +6,9 @@ def read_first_line(input_file):
         
     return line
 
+def read_first_line_as_chars(input_file):
+    return list(read_first_line(input_file))
+
 def read_lines(input_file):
     with open(input_file, "r") as file:
         lines = [line.rstrip("\n") for line in file.readlines()]
